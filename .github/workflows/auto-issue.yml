@@ -14,11 +14,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.COPILOT_DEMO_TOKEN }}
         run: |
-          # 1. Escape the multiline body safely for JSON
+          # 1. Safely store the multiline body
           BODY_TEXT="## Workflow failed 🔴\n\n**Workflow:** ${{ github.event.workflow_run.name }}\n**Branch:** ${{ github.event.workflow_run.head_branch }}\n\nPlease analyze the repo and fix the failing test."
           
-          # 2. Use the dedicated REST/GraphQL endpoint that explicitly targets the agent assignment flow
+          # 2. Use the standard issue creation endpoint but format the array using gh's input flags
           gh api repos/${{ github.repository }}/issues \
             -f title="Fix CI failure: ${{ github.event.workflow_run.name }}" \
             -f body="$BODY_TEXT" \
-            -F assignees='["copilot-swe-agent"]'
+            --input - <<EOF
+          {
+            "assignees": ["copilot-swe-agent"]
+          }
+          EOF

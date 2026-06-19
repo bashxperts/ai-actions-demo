@@ -14,15 +14,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.COPILOT_DEMO_TOKEN }}
         run: |
-          # 1. Safely store the multiline body
+          # 1. Store variables so they map correctly inside the JSON heredoc
+          TITLE_TEXT="Fix CI failure: ${{ github.event.workflow_run.name }}"
           BODY_TEXT="## Workflow failed 🔴\n\n**Workflow:** ${{ github.event.workflow_run.name }}\n**Branch:** ${{ github.event.workflow_run.head_branch }}\n\nPlease analyze the repo and fix the failing test."
           
-          # 2. Use the standard issue creation endpoint but format the array using gh's input flags
-          gh api repos/${{ github.repository }}/issues \
-            -f title="Fix CI failure: ${{ github.event.workflow_run.name }}" \
-            -f body="$BODY_TEXT" \
-            --input - <<EOF
+          # 2. Feed the entire valid JSON structure into the API via stdin
+          gh api repos/${{ github.repository }}/issues --input - <<EOF
           {
+            "title": "$TITLE_TEXT",
+            "body": "$BODY_TEXT",
             "assignees": ["copilot-swe-agent"]
           }
           EOF

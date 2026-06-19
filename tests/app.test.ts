@@ -1,4 +1,4 @@
-// Simple test — will fail because the npm script name is wrong
+// Simple test
 const assert = require('assert');
 
 function add(a, b) { return a + b; }

@@ -28,6 +28,7 @@ jobs:
         with:
           model: gemini-2.0-flash
           api_key: ${{ secrets.GEMINI_API_KEY }}
+          base_url: https://generativelanguage.googleapis.com/v1beta/openai/
           system_prompt: |
             You are a technical writer. Write a concise, friendly changelog entry
             for the following commits. Use present tense. Group related changes.

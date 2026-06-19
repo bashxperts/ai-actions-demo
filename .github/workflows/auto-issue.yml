@@ -10,19 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create issue and assign to Copilot
+      - name: Create issue and assign to Copilot Workspace Agent
         env:
-          # Swapping to your PAT overcomes the GitHub token restriction
-          GH_TOKEN: ${{ secrets.COPILOT_DEMO_TOKEN }} 
+          GH_TOKEN: ${{ secrets.COPILOT_DEMO_TOKEN }}
         run: |
-          gh issue create \
-            --title "Fix CI failure: ${{ github.event.workflow_run.name }}" \
-            --body "## Workflow failed 🔴
-
-          **Workflow:** ${{ github.event.workflow_run.name }}
-          **Branch:** ${{ github.event.workflow_run.head_branch }}
-          **Run URL:** ${{ github.event.workflow_run.html_url }}
-
-          Please analyze the repository code, find out why the tests failed, and open a PR with the fix." \
-            --assignee "@copilot" \
-            --repo ${{ github.repository }}
+          # 1. Escape the multiline body safely for JSON
+          BODY_TEXT="## Workflow failed 🔴\n\n**Workflow:** ${{ github.event.workflow_run.name }}\n**Branch:** ${{ github.event.workflow_run.head_branch }}\n\nPlease analyze the repo and fix the failing test."
+          
+          # 2. Use the dedicated REST/GraphQL endpoint that explicitly targets the agent assignment flow
+          gh api repos/${{ github.repository }}/issues \
+            -f title="Fix CI failure: ${{ github.event.workflow_run.name }}" \
+            -f body="$BODY_TEXT" \
+            -F assignees='["copilot-swe-agent"]'

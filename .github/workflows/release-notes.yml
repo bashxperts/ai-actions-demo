@@ -26,14 +26,13 @@ jobs:
         uses: appleboy/llm-action@v1
         id: ai
         with:
-          provider: gemini
           model: gemini-2.0-flash
           api_key: ${{ secrets.GEMINI_API_KEY }}
-          message: |
+          system_prompt: |
             You are a technical writer. Write a concise, friendly changelog entry
             for the following commits. Use present tense. Group related changes.
             Format as markdown with a date header and bullet points.
-
+          input_prompt: |
             Today's date: ${{ github.event.head_commit.timestamp }}
             Commits:
             ${{ env.LOG }}

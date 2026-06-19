@@ -1,7 +1,4 @@
-// Simple test — will fail because the npm script name is wrong
-const assert = require('assert');
-
-function add(a, b) { return a + b; }
-
-assert.strictEqual(add(2, 3), 5, 'add(2, 3) should equal 5');
-console.log('All tests passed!');
+test('add(2, 3) should equal 5', () => {
+  function add(a: number, b: number) { return a + b; }
+  expect(add(2, 3)).toBe(5);
+});

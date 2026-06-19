@@ -1,4 +1,4 @@
-# AI Actions Demo - Node.js App
+# AI Actions Demo - Node.js App Experion Training
 
 A sample Node.js application demonstrating GitHub Actions CI/CD workflow with build, test, and run capabilities.
 

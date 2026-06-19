@@ -14,15 +14,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.COPILOT_DEMO_TOKEN }}
         run: |
-          # 1. Safely store the multiline body
-          BODY_TEXT="## Workflow failed 🔴\n\n**Workflow:** ${{ github.event.workflow_run.name }}\n**Branch:** ${{ github.event.workflow_run.head_branch }}\n\nPlease analyze the repo and fix the failing test."
-          
-          # 2. Use the standard issue creation endpoint but format the array using gh's input flags
-          gh api repos/${{ github.repository }}/issues \
-            -f title="Fix CI failure: ${{ github.event.workflow_run.name }}" \
-            -f body="$BODY_TEXT" \
-            --input - <<EOF
-          {
-            "assignees": ["copilot-swe-agent"]
-          }
-          EOF
+          gh issue create \
+            --title "CI failure: ${{ github.event.workflow_run.name }}" \
+            --body "## Workflow failed 🔴
+
+          **Workflow:** ${{ github.event.workflow_run.name }}
+          **Branch:** ${{ github.event.workflow_run.head_branch }}
+          **Run URL:** ${{ github.event.workflow_run.html_url }}
+
+          Please investigate and fix the failing workflow." \
+            --assignee "@copilot" \
+            --repo ${{ github.repository }}

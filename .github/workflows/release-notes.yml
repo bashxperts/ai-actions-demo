@@ -41,37 +41,36 @@ jobs:
                   -H "Content-Type: application/json" \
                   -H "Authorization: Bearer $GITHUB_TOKEN" \
                   -d @- <<EOF
-                {
-                  "model": "openai/gpt-4.1",
-                  "messages": [
-                    {
-                      "role": "system",
-                      "content": "You are a technical writer. Write concise release notes in markdown."
-                    },
-                    {
-                      "role": "user",
-                      "content": "Commits:\n$COMMIT_LOG"
-                    }
-                  ]
-                }
-                EOF
-                )
+          					{
+          					  "model": "openai/gpt-4.1",
+          					  "messages": [
+          						{
+          						  "role": "system",
+          						  "content": "You are a technical writer. Write concise release notes in markdown."
+          						},
+          						{
+          						  "role": "user",
+          						  "content": "Commits:\n$COMMIT_LOG"
+          						}
+          					  ]
+          					}
+          					EOF
+          					)
+          echo "$RESPONSE"
             
-                echo "$RESPONSE"
-            
-                  - name: Prepend to CHANGELOG.md
-                    run: |
-                      echo "${{ steps.ai.outputs.response }}" > /tmp/new_entry.md
-                      echo "" >> /tmp/new_entry.md
-                      if [ -f CHANGELOG.md ]; then
-                        cat CHANGELOG.md >> /tmp/new_entry.md
-                      fi
-                      mv /tmp/new_entry.md CHANGELOG.md
-            
-                  - name: Commit and push changelog
-                    run: |
-                      git config user.name "github-actions[bot]"
-                      git config user.email "github-actions[bot]@users.noreply.github.com"
-                      git add CHANGELOG.md
-                      git diff --staged --quiet || git commit -m "docs: AI-generated changelog update [skip ci]"
-                      git push
+        - name: Prepend to CHANGELOG.md
+        run: |
+          echo "${{ steps.ai.outputs.response }}" > /tmp/new_entry.md
+          echo "" >> /tmp/new_entry.md
+          if [ -f CHANGELOG.md ]; then
+          cat CHANGELOG.md >> /tmp/new_entry.md
+          fi
+          mv /tmp/new_entry.md CHANGELOG.md
+        
+        - name: Commit and push changelog
+		run: |
+		  git config user.name "github-actions[bot]"
+		  git config user.email "github-actions[bot]@users.noreply.github.com"
+		  git add CHANGELOG.md
+		  git diff --staged --quiet || git commit -m "docs: AI-generated changelog update [skip ci]"
+		  git push

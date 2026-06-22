@@ -128,4 +128,3 @@ jobs:
               "content",
               data.choices[0].message.content
             );
-

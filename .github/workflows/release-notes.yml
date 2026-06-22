@@ -25,6 +25,8 @@ jobs:
       - name: Generate changelog with Gemini
         uses: appleboy/llm-action@v1
         id: ai
+        env:
+          COMMIT_LOG: ${{ env.LOG }} # Map it explicitly
         with:
           model: gemini-2.0-flash
           api_key: ${{ secrets.GEMINI_API_KEY }}
@@ -34,9 +36,8 @@ jobs:
             for the following commits. Use present tense. Group related changes.
             Format as markdown with a date header and bullet points.
           input_prompt: |
-            Today's date: ${{ github.event.head_commit.timestamp }}
             Commits:
-            ${{ env.LOG }}
+            $COMMIT_LOG
 
       - name: Prepend to CHANGELOG.md
         run: |

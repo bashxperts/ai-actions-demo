@@ -31,11 +31,13 @@ jobs:
           curl -s https://models.github.ai/catalog/models \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" | jq .
 
+
       - name: Generate Changelog
         id: ai
         uses: actions/github-script@v7
         env:
           COMMIT_LOG: ${{ env.LOG }}
+          GH_TOKEN: ${{ github.token }}
         with:
           script: |
             const response = await fetch(
@@ -43,7 +45,7 @@ jobs:
               {
                 method: "POST",
                 headers: {
-                  "Authorization": `Bearer ${process.env.GITHUB_TOKEN}`,
+                  "Authorization": `Bearer ${process.env.GH_TOKEN}`,
                   "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -62,7 +64,16 @@ jobs:
               }
             );
       
-            const data = await response.json();
+            const text = await response.text();
+      
+            console.log("Status:", response.status);
+            console.log("Response:", text);
+      
+            if (!response.ok) {
+              throw new Error(text);
+            }
+      
+            const data = JSON.parse(text);
       
             core.setOutput(
               "content",

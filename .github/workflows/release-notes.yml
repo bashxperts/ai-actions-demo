@@ -26,11 +26,24 @@ jobs:
           echo "" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: List Models
-        run: |
-          curl -s https://models.github.ai/catalog/models \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" | jq .
 
+      - name: List Available Models
+        uses: actions/github-script@v7
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          script: |
+            const response = await fetch(
+              "https://models.github.ai/catalog/models",
+              {
+                headers: {
+                  Authorization: `Bearer ${process.env.GH_TOKEN}`
+                }
+              }
+            );
+      
+            const text = await response.text();
+            console.log(text);
 
       - name: Generate Changelog
         id: ai

@@ -49,7 +49,7 @@ jobs:
           google_api_key: ${{ secrets.GEMINI_API_KEY }}
         with:
           model: gemini-3.5-flash
-          api_key: ${{ env.API_KEY }}
+          #api_key: ${{ env.API_KEY }} # API KEY TO CONNECT GEMINI
           base_url: https://generativelanguage.googleapis.com/v1beta/openai/
           system_prompt: |
             You are an elite principal software engineer and strict code reviewer. 

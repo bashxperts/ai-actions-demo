@@ -22,6 +22,11 @@ jobs:
           echo "" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      - name: Fix Runner Permissions
+        run: |
+          sudo chown -R $USER:$USER /github/file_commands/ || true
+          sudo chmod -R 777 /github/file_commands/ || true
+        
       - name: Generate changelog with Gemini
         uses: appleboy/llm-action@v1
         id: ai

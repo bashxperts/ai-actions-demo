@@ -1,4 +1,4 @@
-name: autofix.ci
+name: "Test Github Autofix CI"
 
 on:
   pull_request:

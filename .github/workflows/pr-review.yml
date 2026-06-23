@@ -1,0 +1,80 @@
+name: 🔎 AI Code Reviewer
+
+on:
+  pull_request:
+    types: [opened, synchronize] # Runs on new PRs and when new commits are pushed
+
+permissions:
+  pull-requests: write # Required so the action can leave review comments
+  contents: read       # Required to pull code diffs safely
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    # Prevent bot-spam: Don't run if the PR was opened by a known bot/AI agent
+    if: |
+      github.event.pull_request.user.login != 'github-actions[bot]' &&
+      github.event.pull_request.user.login != 'copilot-swe-agent'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches full history so we can calculate accurate diffs
+
+      - name: Get PR Code Diff
+        id: pr_diff
+        run: |
+          # Fetch the target base branch so git can compare changes accurately
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          
+          # Generate the clean text diff between the PR branch and the base target branch
+          git diff origin/${{ github.event.pull_request.base.ref }}...HEAD > pr_changes.diff
+          
+          # Check if the diff file is empty
+          if [ ! -s pr_changes.diff ]; then
+            echo "No code modifications discovered."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Review with Gemini
+        if: steps.pr_diff.outputs.has_changes == 'true'
+        uses: aicmo/llm-call-action@v1
+        id: gemini
+        env:
+          # Injecting the diff into a safe environment variable context
+          API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        with:
+          model: gemini-3.5-flash
+          api_key: ${{ env.API_KEY }}
+          base_url: https://generativelanguage.googleapis.com/v1beta/openai/
+          system_prompt: |
+            You are an elite principal software engineer and strict code reviewer. 
+            Review the provided git diff payload for accuracy, optimization flaws, security bugs, and logical regressions.
+            
+            Provide your response in clear, professional markdown matching this structured schema:
+            ### 🛠️ Summary of Changes
+            (Brief high-level summary of what this PR introduces)
+            
+            ### 🚨 Critical Concerns & Bugs
+            (Bullet points focusing ONLY on code breaks, security risks, or major architectural bugs. If none, write "None detected.")
+            
+            ### 💡 Optimization & Styling Suggestions
+            (Constructive minor improvements for performance, readability, or standards)
+          prompt: |
+            Please analyze the following PR diff and generate your code review assessment:
+            
+            ```diff
+            $(cat pr_changes.diff)
+            ```
+
+      - name: Post Review Comment on PR
+        if: steps.pr_diff.outputs.has_changes == 'true' && steps.gemini.outputs.response != ''
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ## 🤖 Gemini AI Automated Code Review
+            ${{ steps.gemini.outputs.response }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }} # Provided automatically by GitHub Actions

@@ -26,7 +26,7 @@ jobs:
         uses: appleboy/llm-action@v1
         id: ai
         with:
-          model: gemini-2.0-flash
+          model: gemini-3.5-flash
           api_key: ${{ secrets.GEMINI_API_KEY }}
           base_url: https://generativelanguage.googleapis.com/v1beta/openai/
           system_prompt: |

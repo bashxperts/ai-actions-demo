@@ -1,4 +1,4 @@
-name: AI Release Notes
+name: "AI Release Notes"
 on:
   push:
     branches: [main]

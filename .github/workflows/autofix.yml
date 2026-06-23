@@ -14,8 +14,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # Runs Prettier directly over all files without needing an npm install step
+        
+      - name: Discard automated changes to GitHub workflows
+        run: git checkout HEAD -- .github/
+        
       - name: Run Prettier Formatter
         run: npx prettier --write .
 

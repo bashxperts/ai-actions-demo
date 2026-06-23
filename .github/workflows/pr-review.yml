@@ -41,7 +41,7 @@ jobs:
 
       - name: Run Review with Gemini
         if: steps.pr_diff.outputs.has_changes == 'true'
-        uses: aicmo/llm-call-action@v1
+        uses: appleboy/llm-action@v1
         id: gemini
         env:
           provider: google
@@ -49,7 +49,7 @@ jobs:
           google_api_key: ${{ secrets.GEMINI_API_KEY }}
         with:
           model: gemini-3.5-flash
-          #api_key: ${{ env.API_KEY }} # API KEY TO CONNECT GEMINI
+          api_key: ${{ secrets.GEMINI_API_KEY }}
           base_url: https://generativelanguage.googleapis.com/v1beta/openai/
           system_prompt: |
             You are an elite principal software engineer and strict code reviewer. 

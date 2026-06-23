@@ -70,7 +70,9 @@ jobs:
             ```diff
             $(cat pr_changes.diff)
             ```
-
+          input_prompt: |
+            Today's date: ${{ github.event.head_commit.timestamp }}
+            
       - name: Post Review Comment on PR
         if: steps.pr_diff.outputs.has_changes == 'true' && steps.gemini.outputs.response != ''
         uses: mshick/add-pr-comment@v2

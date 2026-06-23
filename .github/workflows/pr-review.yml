@@ -44,8 +44,9 @@ jobs:
         uses: aicmo/llm-call-action@v1
         id: gemini
         env:
-          # Injecting the diff into a safe environment variable context
-          API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          provider: google
+          model: gemini-3.5-flash
+          google_api_key: ${{ secrets.GEMINI_API_KEY }}
         with:
           model: gemini-3.5-flash
           api_key: ${{ env.API_KEY }}
